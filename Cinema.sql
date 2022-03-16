@@ -61,3 +61,151 @@ PostiDaPrenotare int not null check(PostiDaPrenotare>0),
 CodiceProgrammazione int constraint FK_PRE_PROG foreign key references Programmazione(CodiceProgrammazione)
 )
 
+--inserimento dati
+--Insert into NomeTabella Values (valori da inserire nell'ordine delle colonne) 
+insert into Film values('Harry Potter e la pietra filosofare', 'Fantasy', 140)
+insert into Film values('Il re leone', 'Animazione', 145)
+
+insert into Film values('Mamma ho perso l''aereo', 'Commedia', 125),
+					   ('Preatty Woman', 'Commedia', 156)
+
+select * from Film
+select * from Attore
+
+insert into Attore values ('Julia Roberts', 'Americana', '1967-10-28')
+insert into Attore values ('Macaulay Culkin', 'Americano', '1977-11-23')
+insert into Attore values ('Richard Gere', 'Americano', '1950-12-25')
+insert into Attore values ('Daniel Radcliffe', 'Americano', '1990-08-15')
+
+select * from FilmAttore
+
+insert into FilmAttore values(1,4,284522.23)
+insert into FilmAttore values(3,2,20000)
+insert into FilmAttore values(4,1,100000)
+insert into FilmAttore values(4,3,100000)
+
+insert into Sala values ('Sala rossa', 120), ('Sala verde',80), ('Sala Bianca', 80)
+select * from Sala
+
+insert into Programmazione values ('2022-03-16 17:00', 30, 4, 1)
+insert into Programmazione values ('2022-03-16 21:00', 50, 3, 2)
+--insert into Programmazione values ('2022-03-16 17:00', 30, 2, 1)  violato vincolo di unicità (sala, dataOra)
+select * from Programmazione
+
+insert into Prenotazione values ('renata@mail.it', 3, 1)
+insert into Prenotazione values ('mario@mail.it', 3, 1)
+select * from Prenotazione
+
+--esempio di delete con condizione
+delete from Prenotazione where CodicePrenotazione=1
+
+--esepio di update con condizione
+update Attore SET Nazionalita='USA' where Nazionalita='Americana'
+
+--tutti i campi e tutti i record della tabella film
+select * from Film
+
+--solo alcuni campi: solo titolo e durata
+select Titolo, durata
+from Film
+
+--alias AS per etichettare/rinominare i nomi delle colonne in visualizzazione!
+select Titolo as [Titolo del Film], durata as DurataDelFilm
+from Film
+
+select * from Film
+--select con condizione (where)
+--selezionare titolo, genere, durata dei film che durano almeno 130 minuti
+
+select Titolo, Genere, Durata
+from Film
+where Durata>=130
+
+insert into Film values ('Dott. Potter', 'Commedia', 180),
+						('Harry Potter e la camera dei segreti', 'Fantasy', 170)
+
+
+-- like % --Nota: Attenzione agli spazi!
+--Selezionare Titolo e genere dei film su Harry Potter
+select Titolo, Genere
+from Film
+where Titolo like 'Harry Potter %'
+
+--Selezionare Titolo e genere dei film contenti Potter nel titolo
+select Titolo, Genere
+from Film
+where Titolo like '%Potter%'
+
+--Distinct
+--seleziono tutti i generi dei film (distinti)
+select distinct Genere
+from Film
+
+--selezionare tutti i film fantasy con durata inferiore a 150 minuti
+select *
+from Film
+where Genere='Fantasy' and Durata<150
+
+--selezionare tutti i film fantasy o con durata inferiore a 150 minuti
+
+select *
+from Film
+where Film.Genere='Fantasy' OR Durata<150
+
+select * from Programmazione
+--visualizzare i dati dei film per cui esiste una programmazione
+select Film.*, Programmazione.DataOra as 'Data e ora di programmazione'
+from Film, Programmazione
+where Film.CodiceFilm=Programmazione.CodiceFilm
+
+select Film.*, Programmazione.DataOra as 'Data e ora di programmazione'
+from Film join Programmazione 
+on Film.CodiceFilm=Programmazione.CodiceFilm
+
+select * 
+from Programmazione right join Film 
+on Film.CodiceFilm=Programmazione.CodiceFilm
+
+select * 
+from Film f left join Programmazione as p
+on f.CodiceFilm=p.CodiceFilm
+
+--selezionare il titolo dei film per cui è prevista una programmazione nella sala rossa
+select f.Titolo
+from Film f, Programmazione p, Sala s
+where f.CodiceFilm=p.CodiceFilm 
+      and s.CodiceSala=p.CodiceSala
+	  and s.Nome='Sala Rossa'
+	  
+select f.Titolo
+from Film f join Programmazione p on f.CodiceFilm=p.CodiceFilm
+			join Sala s on s.CodiceSala=p.CodiceSala
+where s.Nome='Sala Rossa'
+
+--visaulizzare i dati di riepilogo dei film programmati
+select f.Titolo 'Titolo Film', f.Genere, f.Durata as 'Durata in minuti', s.Nome as 'Nome Sala',
+	   p.PostiDisponibili, p.DataOra 'Data e ora programmazione'
+from Film f join Programmazione p on f.CodiceFilm=p.CodiceFilm
+			join Sala s on s.CodiceSala=p.CodiceSala
+
+--Order by 
+--Mostrare titolo, genere e durata dei film in ordine di durata crescente
+select Titolo, Genere, Durata
+from Film
+order by Durata
+--Mostrare titolo, genere e durata dei film in ordine di durata decrescente
+select Titolo, Genere, Durata
+from Film
+order by Durata desc
+
+--Mostrare titolo, genere e durata dei film in ordine di genere crescente e durata decrescente 
+select Titolo, Genere, Durata
+from Film
+order by Genere asc, Durata desc 
+
+--Esercitazione
+--1.	Mostrare tutti gli attori del film Harry Potter e la pietra in ordine alfabetico crescente
+--2.	Mostrare Nome, nazionalità e cachet percepito dagli attori di “Mamma Ho perso l’aereo” in ordine decrescente per cachet percepito.
+--3.	Mostrare tutti gli attori dei film programmati nella sala verde.
+--4.	Mostrare quanti posti disponibili ci sono nella programmazione di oggi alle 17:00 del film Mamma ho perso l’aereo.
+--5.	Mostrare gli attori (nome e data di nascita) dei soli film proiettati oggi nella sala rossa se i posti disponibili sono maggiori di 30 e se il cachet percepito è superiore a 1000 euro
