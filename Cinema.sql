@@ -89,6 +89,8 @@ select * from Sala
 
 insert into Programmazione values ('2022-03-16 17:00', 30, 4, 1)
 insert into Programmazione values ('2022-03-16 21:00', 50, 3, 2)
+insert into Programmazione values ('2022-03-16 17:00', 20, 3, 2)
+
 --insert into Programmazione values ('2022-03-16 17:00', 30, 2, 1)  violato vincolo di unicità (sala, dataOra)
 select * from Programmazione
 
@@ -209,3 +211,70 @@ order by Genere asc, Durata desc
 --3.	Mostrare tutti gli attori dei film programmati nella sala verde.
 --4.	Mostrare quanti posti disponibili ci sono nella programmazione di oggi alle 17:00 del film Mamma ho perso l’aereo.
 --5.	Mostrare gli attori (nome e data di nascita) dei soli film proiettati oggi nella sala rossa se i posti disponibili sono maggiori di 30 e se il cachet percepito è superiore a 1000 euro
+
+--1.Mostrare tutti gli attori del film Harry Potter e la pietra filosofare in ordine alfabetico crescente
+select *
+from Attore a
+join FilmAttore fa on a.CodiceAttore=fa.CodiceAttore
+join Film f on fa.CodiceFilm=f.CodiceFilm
+where f.Titolo='Harry Potter e la pietra filosofare'
+order by Nome
+
+--2.Mostrare Nome, nazionalità e cachet percepito dagli attori di “Mamma Ho perso l’aereo” in ordine decrescente per cachet percepito.
+select a.Nome, a.Nazionalita, fa.Cachet
+from Attore a
+join FilmAttore fa on a.CodiceAttore=fa.CodiceAttore
+join Film f on fa.CodiceFilm=f.CodiceFilm
+where f.Titolo='Mamma ho perso l''aereo'
+order by Cachet desc
+
+--3.Mostrare tutti gli attori dei film programmati nella sala verde.
+Select *
+from sala s join programmazione p on s.CodiceSala=p.CodiceSala
+join film f on p.CodiceFilm=f.CodiceFilm
+join filmAttore fa on fa.CodiceFilm=f.CodiceFilm
+join attore a on fa.CodiceAttore=a.CodiceAttore
+where s.Nome='Sala Verde'
+
+--4.Mostrare quanti posti disponibili ci sono nella programmazione di oggi alle 17:00 del film Mamma ho perso l’aereo.
+select PostiDisponibili
+from Programmazione p join film f on p.CodiceFilm=f.CodiceFilm
+where f.titolo='Mamma ho perso l''aereo' --And p.DataOra='2022-03-16 17:00'
+and DAY(p.dataOra) =DAY(sysdatetime())
+--and datepart(DAYOFYEAR,p.DataOra)=datepart(DAYOFYEAR, SYSDATETIME())
+and DATEPART(HOUR, p.DataOra)=17
+and DATEPART(MINUTE, p.DataOra)=0
+
+--5.Mostrare gli attori (nome e data di nascita) dei soli film proiettati oggi nella sala rossa se i posti disponibili sono maggiori di 30 e se il cachet percepito è superiore a 1000 euro
+select a.Nome as [Nome Attore], DataNascita as [Data di nascita]
+from Attore a   join FilmAttore fa on a.CodiceAttore=fa.CodiceAttore
+				join Film f on f.CodiceFilm=fa.CodiceFilm
+				join Programmazione p on p.CodiceFilm=f.CodiceFilm
+				join Sala s on p.CodiceSala=s.CodiceSala
+where s.Nome ='Sala Rossa' And p.PostiDisponibili>30 and cachet>1000 
+and datepart(DAYOFYEAR,p.DataOra)=datepart(DAYOFYEAR, SYSDATETIME())
+--and p.DataOra between '2022-03-16 00:00' and '2022-03-16 23:59'
+
+--between
+--selezionare tutte le programmazioni del mese di giugno
+select *
+from Programmazione p
+where p.DataOra>='2022-06-01' and p.DataOra <= '2022-06-30'
+
+select *
+from Programmazione p
+where p.DataOra between '2022-06-01' and '2022-06-30'
+
+--IN
+--selezionare tutti i film di genere fantasy o drammatici
+select * 
+from Film
+where Genere='Fantasy' or Genere='Drammatico'
+
+select * 
+from Film
+where Genere in ('Fantasy','Drammatico')
+
+
+
+
