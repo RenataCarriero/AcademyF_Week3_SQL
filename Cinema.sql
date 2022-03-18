@@ -275,6 +275,44 @@ select *
 from Film
 where Genere in ('Fantasy','Drammatico')
 
+--Group by
+select * from Programmazione
+select * from Sala
+
+--select *
+--from Programmazione p right join Sala s on p.CodiceSala=s.CodiceSala
+
+--visualizzare il numero di programmazioni per sala
+select s.CodiceSala, s.Nome, COUNT(p.CodiceProgrammazione) as [Numero Programmazioni]
+from Programmazione p right join Sala s on p.CodiceSala=s.CodiceSala
+group by s.CodiceSala, s.Nome
+
+--visualizzare per ogni programmazione il totale dei posti prenotati
+select * from Prenotazione
+
+select CodiceProgrammazione, SUM(PostiDaPrenotare) as [Totale posti prenotati]
+from Prenotazione
+group by CodiceProgrammazione
 
 
+select * from Film
+--mostrare la durata massima, minima e media dei film raggruppati per genere
+select Genere, MAX(Durata) 'Durata Max', MIN(Durata) 'Durata Min', AVG(Durata) 'Durata Media'
+from Film
+group by Genere
+
+select Titolo
+from Film
+where Durata=(
+		select [Durata Max]
+		from (select Genere, MAX(Durata) 'Durata Max', MIN(Durata) 'Durata Min', AVG(Durata) 'Durata Media'
+			  from Film
+			  group by Genere) as TabellaValoriPerGenere
+		where Genere='Fantasy')
+
+--visualizzare le sale con il numero delle programmazioni che hanno una media di posti disponibili maggiore di 30
+select s.CodiceSala, s.Nome, COUNT(p.CodiceProgrammazione)
+from Programmazione p right join Sala s on s.CodiceSala=p.CodiceSala
+group by s.CodiceSala, s.Nome
+having AVG(p.PostiDisponibili)>30
 
